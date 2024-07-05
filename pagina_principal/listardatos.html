@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/estilotabla.css">
+    <title>Document</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="listardatos.html">Listar Datos</a></li>
+        </ul>
+    </nav>
+    <h2>Helados</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Sabor</th>
+                <th>Tipo</th>
+                <th>Cobertura</th>
+                <th>Precio</th>
+                <th>Imagen</th> <!-- Nueva columna para la imagen -->
+                <th>Acciones</th> <!-- Nueva columna para las acciones -->
+            </tr>
+        </thead>
+        <tbody id="helados-list"></tbody>
+    </table>
+
+    <script>
+        // Función para cargar los helados al cargar la página
+        window.onload = function () {
+            // Realizar una solicitud GET a la ruta /helados
+            fetch('/helados')
+            // Procesar la respuesta como JSON
+            .then(function(response) {
+                return response.json();
+            })
+            // Cuando se obtienen los datos JSON
+            .then(function(data) {
+                // Obtener una referencia al elemento HTML con el ID 'helados-list'
+                var heladosList = document.getElementById('helados-list');
+                // Iterar sobre cada helado en los datos recibidos
+                data.forEach(function(helado) {
+                    // Crear una nueva fila de tabla
+                    var row = document.createElement('tr');
+                    // Establecer el contenido HTML de la fila con los datos del helado
+                    row.innerHTML = '<td>' + helado.nombre + '</td>' +
+                                    '<td>' + helado.descripcion + '</td>' +
+                                    '<td>' + helado.sabor + '</td>' +
+                                    '<td>' + helado.tipo + '</td>' +
+                                    '<td>' + helado.cobertura + '</td>' +
+                                    '<td>' + helado.precio + '</td>' +
+                                    '<td><img src="/images/helados/' + helado.imagen + '" style="max-width: 100px; max-height: 100px;"></td>' + // Mostrar la imagen
+                                    '<td>' +
+                                        '<button onclick="eliminarHelado(' + helado.id + ')">Eliminar</button>' +
+                                        '<button onclick="detalleHelado(' + helado.id + ')">Ver Detalle</button>' +
+                                    '</td>';
+                    // Agregar la fila a la lista de helados
+                    heladosList.appendChild(row);
+                });
+            });
+        };
+
+        // Función para eliminar un helado
+        function eliminarHelado(id) {
+            // Confirmar antes de eliminar
+            if (confirm('¿Estás seguro de que quieres eliminar este helado?')) {
+                // Realizar una solicitud DELETE a la ruta /helado/:id
+                fetch('/admin/eliminar_helado/' + id, {
+                    method: 'DELETE'
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        // Recargar la página para reflejar los cambios
+                        location.reload();
+                    } else {
+                        alert('No se pudo eliminar el helado.');
+                    }
+                });
+            }
+        }
+
+        // Función para ver los detalles de un helado
+        function detalleHelado(id) {
+            // Redirigir a una página de detalles con el ID del helado
+            window.location.href = '/detalle.html?id=' + id;
+        }
+    </script>
+
+</body>
+</html>
